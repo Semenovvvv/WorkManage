@@ -1,0 +1,104 @@
+﻿@page "/exportexcel"
+@* @attribute [Authorize(Roles = "Administrator")] *@
+
+@using ClosedXML.Excel
+@using Microsoft.AspNetCore.Authorization
+@using Microsoft.EntityFrameworkCore
+@using WorkManage.Data
+@inject IDbContextFactory<WorkManage.Data.ApplicationDbContext> DbFactory
+@implements IAsyncDisposable
+@rendermode InteractiveServer
+@inject IJSRuntime js
+
+<button type="button" class="btn btn-success mb-2" @onclick="@ExportXLSWorks">Экспорт всех таблиц в Excel</button>
+
+@code {
+    ApplicationDbContext context = default!;
+
+    protected override async Task OnInitializedAsync()
+    {
+        context = DbFactory.CreateDbContext();
+    }
+
+    public async Task ExportXLSWorks()
+    {
+        var XLSStream = ExportXLSResult();
+
+        await js.InvokeVoidAsync("BlazorDownloadFile", "РемонтныеРаботы.xlsx", XLSStream);
+    }
+
+    private byte[] ExportXLSResult()
+    {
+        using var workbook = new XLWorkbook();
+
+        var worksheetWorks = workbook.Worksheets.Add("Works");
+        worksheetWorks.Cell(1, 1).Value = "WorkId";
+        worksheetWorks.Cell(1, 2).Value = "MasterId";
+        worksheetWorks.Cell(1, 3).Value = "Price";
+        worksheetWorks.Cell(1, 4).Value = "DaysCount";
+        worksheetWorks.Cell(1, 5).Value = "Name";
+
+        worksheetWorks.Row(1).Style.Font.Bold = true;
+
+        int i = 2;
+
+        foreach (var work in context.Works)
+        {
+            worksheetWorks.Cell(i, 1).Value = work.Id;
+            worksheetWorks.Cell(i, 2).Value = work.MasterId;
+            worksheetWorks.Cell(i, 3).Value = work.Price;
+            worksheetWorks.Cell(i, 4).Value = work.DaysCount;
+            worksheetWorks.Cell(i, 5).Value = work.Name;
+            i++;
+        }
+
+        var worksheetWorkStages = workbook.Worksheets.Add("WorkStages");
+        worksheetWorkStages.Cell(1, 1).Value = "WorkStageId";
+        worksheetWorkStages.Cell(1, 2).Value = "WorkId";
+        worksheetWorkStages.Cell(1, 3).Value = "Name";
+        worksheetWorkStages.Cell(1, 4).Value = "Price";
+
+        worksheetWorkStages.Row(1).Style.Font.Bold = true;
+
+        i = 2;
+
+        foreach (var workStages in context.WorkStages)
+        {
+            worksheetWorkStages.Cell(i, 1).Value = workStages.Id;
+            worksheetWorkStages.Cell(i, 2).Value = workStages.WorkId;
+            worksheetWorkStages.Cell(i, 3).Value = workStages.Name;
+            worksheetWorkStages.Cell(i, 4).Value = workStages.Price;
+            i++;
+        }
+
+        var worksheetMasters = workbook.Worksheets.Add("Masters");
+        worksheetMasters.Cell(1, 1).Value = "MasterId";
+        worksheetMasters.Cell(1, 2).Value = "LastName";
+        worksheetMasters.Cell(1, 3).Value = "FirstName";
+        worksheetMasters.Cell(1, 4).Value = "Patronymic";
+        worksheetMasters.Cell(1, 5).Value = "Rank";
+        worksheetMasters.Cell(1, 6).Value = "HireDate";
+
+        worksheetMasters.Row(1).Style.Font.Bold = true;
+
+        i = 2;
+
+        foreach (var master in context.Masters)
+        {
+            worksheetMasters.Cell(i, 1).Value = master.Id;
+            worksheetMasters.Cell(i, 2).Value = master.LastName;
+            worksheetMasters.Cell(i, 3).Value = master.FirstName;
+            worksheetMasters.Cell(i, 4).Value = master.Patronymic;
+            worksheetMasters.Cell(i, 5).Value = master.Rank;
+            worksheetMasters.Cell(i, 6).Value = master.HireDate;
+            i++;
+        }
+
+        MemoryStream XLSStream = new();
+        workbook.SaveAs(XLSStream);
+
+        return XLSStream.ToArray();
+    }
+
+    public async ValueTask DisposeAsync() => await context.DisposeAsync();
+}

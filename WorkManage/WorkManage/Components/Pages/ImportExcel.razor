@@ -1,0 +1,238 @@
+﻿@page "/importexcel"
+@* @attribute [Authorize(Roles = "Administrator")] *@
+
+@rendermode InteractiveServer
+@using ClosedXML.Excel
+@using Microsoft.AspNetCore.Identity
+@using Microsoft.EntityFrameworkCore
+@inject IDbContextFactory<WorkManage.Data.ApplicationDbContext> DbFactory
+@using Microsoft.AspNetCore.Components.Forms;
+@using WorkManage.Data.Models
+
+
+<PageTitle>Загрузка файла Excel для импорта в базу данных</PageTitle>
+
+<p>
+    <label>
+        Укажите файл Excel для импорта:
+        <InputFile OnChange="LoadFiles"  />
+    </label>
+</p>
+@if (isLoading)
+{
+        <p>Uploading...</p>
+}
+else
+{
+        <ul>
+
+
+        <div>Количество импортированных мастеров: @Masters.Count()</div>
+        <div>Количество импортированных работ: @Works.Count()</div>
+        <div>Количество импортированных стадий работ: @WorkStages.Count()</div>
+        @if (StartTime != null)
+        {
+            TimeSpan ts = (EndTime ?? DateTime.Now).Subtract(StartTime ?? DateTime.Now);
+                    <div>
+                        Время выполнения: @String.Format("{0:00}:{1:00}", ts.Seconds, ts.Milliseconds / 10);
+                    </div>
+        }
+        </ul>
+}
+
+@if (!string.IsNullOrEmpty(ErrorMessage))
+{
+        <div>Error: @ErrorMessage</div>
+}
+
+@code {
+
+    protected override async Task OnInitializedAsync()
+    {
+
+    }
+
+    public string ErrorMessage { get; set; } = "";
+
+    DateTime? StartTime;
+    DateTime? EndTime;
+
+    public List<Master> Masters = new();
+    public List<Work> Works = new();
+    public List<WorkStage> WorkStages = new();
+
+    public List<IdentityUserRole<string>> userrolesList = new();
+
+
+
+    private bool isLoading;
+
+    string? errworksheet { get; set; } = "";
+
+    int? errindexrow { get; set; } = 0;
+    const int MAX_FILESIZE = 5000 * 1024; // 5 MB
+
+    private async Task LoadFiles(InputFileChangeEventArgs e)
+    {
+
+        isLoading = true;
+
+
+        var browserFile = e.File;
+
+        if (browserFile != null)
+        {
+            try
+            {
+                using (var fileStream = browserFile.OpenReadStream(MAX_FILESIZE))
+                {
+                    Masters = new();
+                    Works = new();
+                    WorkStages = new();
+
+                    var randomFile = Path.GetTempFileName();
+                    var extension = Path.GetExtension(browserFile.Name);
+                    var targetFilePath = Path.ChangeExtension(randomFile, extension);
+                    using (var destinationStream = new FileStream(targetFilePath, FileMode.Create))
+                    {
+                        await fileStream.CopyToAsync(destinationStream);
+                        StartTime = DateTime.Now;
+                        await GetDataTableFromExcelAsync(destinationStream);
+                        EndTime = DateTime.Now;
+                    }
+                }
+            }
+            catch (Exception exception)
+            {
+                ErrorMessage = exception.Message;
+            }
+        }
+
+        isLoading = false;
+    }
+    public async Task GetDataTableFromExcelAsync(FileStream file)
+    {
+        using (var context = DbFactory.CreateDbContext())
+        {
+
+
+            using (XLWorkbook workbook = new XLWorkbook(file))
+            {
+                var passwordHasher = new PasswordHasher<ApplicationUser>();
+
+                try
+                {
+                    foreach (IXLWorksheet worksheet in workbook.Worksheets)
+                    {
+                        errindexrow = 1;
+                        errworksheet = worksheet.Name;
+                        if (worksheet.Name == "Works")
+                        {
+                            foreach (IXLRow row in worksheet.RowsUsed().Skip(1))
+                            {
+                                errindexrow++;
+                                var work = new Work();
+                                var range = worksheet.RangeUsed();
+                                var table = range!.AsTable();
+                                work.Id = int.Parse(row.Cell(table.FindColumn(c => c.FirstCell().Value.ToString() == "WorkId").RangeAddress.FirstAddress.ColumnNumber).Value.ToString());
+                                work.MasterId = int.Parse(row.Cell(table.FindColumn(c => c.FirstCell().Value.ToString() == "MasterId").RangeAddress.FirstAddress.ColumnNumber).Value.ToString());
+                                work.Price = int.Parse(row.Cell(table.FindColumn(c => c.FirstCell().Value.ToString() == "Price").RangeAddress.FirstAddress.ColumnNumber).Value.ToString());
+                                work.DaysCount = int.Parse(row.Cell(table.FindColumn(c => c.FirstCell().Value.ToString() == "DaysCount").RangeAddress.FirstAddress.ColumnNumber).Value.ToString());
+                                work.Name = row.Cell(table.FindColumn(c => c.FirstCell().Value.ToString() == "Name").RangeAddress.FirstAddress.ColumnNumber).Value.ToString();
+
+                                Works.Add(work);
+
+                            }
+                        }
+                        errindexrow = 1;
+
+                        if (worksheet.Name == "WorkStages")
+                        {
+                            foreach (IXLRow row in worksheet.RowsUsed().Skip(1))
+                            {
+                                errindexrow++;
+
+                                var workStage = new WorkStage();
+                                var range = worksheet.RangeUsed();
+                                var table = range!.AsTable();
+
+                                workStage.Id = int.Parse(row.Cell(table.FindColumn(c => c.FirstCell().Value.ToString() == "WorkStageId").RangeAddress.FirstAddress.ColumnNumber).Value.ToString());
+                                workStage.WorkId = int.Parse(row.Cell(table.FindColumn(c => c.FirstCell().Value.ToString() == "WorkId").RangeAddress.FirstAddress.ColumnNumber).Value.ToString());
+                                workStage.Name = row.Cell(table.FindColumn(c => c.FirstCell().Value.ToString() == "Name").RangeAddress.FirstAddress.ColumnNumber).Value.ToString();
+                                workStage.Price = int.Parse(row.Cell(table.FindColumn(c => c.FirstCell().Value.ToString() == "Price").RangeAddress.FirstAddress.ColumnNumber).Value.ToString());
+
+                                WorkStages.Add(workStage);
+
+                            }
+                        }
+
+
+                        errindexrow = 1;
+                        if (worksheet.Name == "Masters")
+                        {
+                            foreach (IXLRow row in worksheet.RowsUsed().Skip(1))
+                            {
+                                errindexrow++;
+                                var master = new Master();
+                                var range = worksheet.RangeUsed();
+                                var table = range!.AsTable();
+
+                                master.Id = int.Parse(row.Cell(table.FindColumn(c => c.FirstCell().Value.ToString() == "MasterId").RangeAddress.FirstAddress.ColumnNumber).Value.ToString());
+                                master.LastName = row.Cell(table.FindColumn(c => c.FirstCell().Value.ToString() == "LastName").RangeAddress.FirstAddress.ColumnNumber).Value.ToString();
+                                master.FirstName = row.Cell(table.FindColumn(c => c.FirstCell().Value.ToString() == "FirstName").RangeAddress.FirstAddress.ColumnNumber).Value.ToString();
+                                master.Patronymic = row.Cell(table.FindColumn(c => c.FirstCell().Value.ToString() == "Patronymic").RangeAddress.FirstAddress.ColumnNumber).Value.ToString();
+                                master.Rank = row.Cell(table.FindColumn(c => c.FirstCell().Value.ToString() == "Rank").RangeAddress.FirstAddress.ColumnNumber).Value.ToString();
+                                master.HireDate = DateTime.Parse(row.Cell(table.FindColumn(c => c.FirstCell().Value.ToString() == "HireDate").RangeAddress.FirstAddress.ColumnNumber).Value.ToString());
+
+                                Masters.Add(master);
+                            }
+                        }
+                    }
+
+                    errworksheet = "";
+                    foreach (var work in Works)
+                    {
+                        work.Id = 0;
+                    }
+                    foreach (var workStage in WorkStages)
+                    {
+                        workStage.Id = 0;
+                    }
+
+                    foreach (var master in Masters)
+                    {
+                        master.Id = 0;
+                    }
+
+
+                    using (var transaction = context.Database.BeginTransaction())
+                    {
+                        context.AddRange(Masters);
+                        context.AddRange(Works);
+
+                        await context.SaveChangesAsync();
+
+                        transaction.Commit();
+                    }
+
+                    using (var transaction = context.Database.BeginTransaction())
+                    {
+                        context.AddRange(WorkStages);
+
+                        await context.SaveChangesAsync();
+
+                        transaction.Commit();
+                    }
+                }
+                catch (Exception exception)
+                {
+                    if (errworksheet != "")
+                        ErrorMessage = "Ошибка в импорте в таблице " + errworksheet + ", строка - " + errindexrow.ToString();
+                    ErrorMessage = exception.Message;
+                }
+
+            }
+        }
+
+    }
+}
