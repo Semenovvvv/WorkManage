@@ -1,0 +1,74 @@
+﻿@page "/masters/delete"
+
+@using Microsoft.EntityFrameworkCore
+@using WorkManage.Data.Models
+@inject IDbContextFactory<WorkManage.Data.ApplicationDbContext> DbFactory
+@inject NavigationManager NavigationManager
+
+
+<PageTitle>Delete</PageTitle>
+
+<h1>Delete</h1>
+
+<h3>Are you sure you want to delete this?</h3>
+<div>
+    <h4>Master</h4>
+    <hr />
+    @if (master is null)
+    {
+        <p><em>Loading...</em></p>
+    }
+    else
+    {
+        <dl class="row">
+            <dt class="col-sm-2">Фамилия</dt>
+            <dd class="col-sm-10">@master.LastName</dd>
+        </dl>
+        <dl class="row">
+            <dt class="col-sm-2">Имя</dt>
+            <dd class="col-sm-10">@master.FirstName</dd>
+        </dl>
+        <dl class="row">
+            <dt class="col-sm-2">Отчество</dt>
+            <dd class="col-sm-10">@master.Patronymic</dd>
+        </dl>
+        <dl class="row">
+            <dt class="col-sm-2">Дата найма</dt>
+            <dd class="col-sm-10">@master.HireDate</dd>
+        </dl>
+        <dl class="row">
+            <dt class="col-sm-2">Разряд</dt>
+            <dd class="col-sm-10">@master.Rank</dd>
+        </dl>
+        <EditForm method="post" Model="master" OnValidSubmit="DeleteMaster" FormName="delete" Enhance>
+         <button type="submit" class="btn btn-danger" disabled="@(master is null)">Delete</button> |
+         <a href="/masters">Back to List</a>
+     </EditForm>
+    }
+</div>
+
+@code {
+    Master? master;
+
+    [SupplyParameterFromQuery]
+    public int MasterId { get; set; }
+
+    protected override async Task OnInitializedAsync()
+    {
+        using var context = DbFactory.CreateDbContext();
+        master = await context.Masters.FirstOrDefaultAsync(m => m.Id == MasterId);
+
+        if (master is null)
+        {
+            NavigationManager.NavigateTo("notfound");
+        }
+    }
+
+    public async Task DeleteMaster()
+    {
+        using var context = DbFactory.CreateDbContext();
+        context.Masters.Remove(master!);
+        await context.SaveChangesAsync();
+        NavigationManager.NavigateTo("/masters");
+    }
+}

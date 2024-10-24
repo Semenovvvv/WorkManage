@@ -1,0 +1,59 @@
+﻿@page "/masters/details"
+
+@using Microsoft.EntityFrameworkCore
+@using WorkManage.Data
+@using WorkManage.Data.Models
+@inject IDbContextFactory<WorkManage.Data.ApplicationDbContext> DbFactory
+@inject NavigationManager NavigationManager
+
+<PageTitle>Details</PageTitle>
+
+<h1>Подробности</h1>
+
+<div>
+    <h4>Мастер</h4>
+    <hr />
+    @if (master is null)
+    {
+        <p><em>Loading...</em></p>
+    }
+    else
+    {
+        <dl class="row">
+            <dt class="col-sm-2">Фамилия</dt>
+            <dd class="col-sm-10">@master.LastName</dd>
+            <dt class="col-sm-2">Имя</dt>
+            <dd class="col-sm-10">@master.FirstName</dd>
+            <dt class="col-sm-2">Отчество</dt>
+            <dd class="col-sm-10">@master.Patronymic</dd>
+            <dt class="col-sm-2">Дата найма</dt>
+            <dd class="col-sm-10">@master.HireDate</dd>
+            <dt class="col-sm-2">Разряд</dt>
+            <dd class="col-sm-10">@master.Rank</dd>
+            <dt class="col-sm-2">Колчество работ</dt>
+            <dd class="col-sm-10">@master.Works.Count()</dd>
+        </dl>
+        <div>
+            <a href="@($"/masters/edit?masterid={master.Id}")">Изменить</a> |
+            <a href="@($"/masters")">Back to List</a>
+        </div>
+    }
+</div>
+
+@code {
+    Master? master;
+
+    [SupplyParameterFromQuery]
+    public int MasterId { get; set; }
+
+    protected override async Task OnInitializedAsync()
+    {
+        using var context = DbFactory.CreateDbContext();
+        master = await context.Masters.FirstOrDefaultAsync(m => m.Id == MasterId);
+
+        if (master is null)
+        {
+            NavigationManager.NavigateTo("notfound");
+        }
+    }
+}

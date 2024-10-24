@@ -1,0 +1,53 @@
+﻿@page "/workstages/details"
+
+@using Microsoft.EntityFrameworkCore
+@using WorkManage.Data
+@using WorkManage.Data.Models
+@inject IDbContextFactory<WorkManage.Data.ApplicationDbContext> DbFactory
+@inject NavigationManager NavigationManager
+
+<PageTitle>Details</PageTitle>
+
+<h1>Подробности</h1>
+
+<div>
+    <h4>Стадии работы</h4>
+    <hr />
+    @if (workStage is null)
+    {
+        <p><em>Loading...</em></p>
+    }
+    else
+    {
+        <dl class="row">
+            <dt class="col-sm-2">Название работы</dt>
+            <dd class="col-sm-10">@workStage.Work.Name</dd>
+            <dt class="col-sm-2">Название стадии</dt>
+            <dd class="col-sm-10">@workStage.Name</dd>
+            <dt class="col-sm-2">Стоимость стадии</dt>
+            <dd class="col-sm-10">@workStage.Price</dd>
+        </dl>
+        <div>
+            <a href="@($"/wotkstages/edit?workstageid={workStage.Id}")">Изменить</a> |
+            <a href="@($"/workstages")">Back to List</a>
+        </div>
+    }
+</div>
+
+@code {
+    WorkStage? workStage;
+
+    [SupplyParameterFromQuery]
+    public int WorkStageId { get; set; }
+
+    protected override async Task OnInitializedAsync()
+    {
+        using var context = DbFactory.CreateDbContext();
+        workStage = await context.WorkStages.FirstOrDefaultAsync(m => m.Id == WorkStageId);
+
+        if (workStage is null)
+        {
+            NavigationManager.NavigateTo("notfound");
+        }
+    }
+}

@@ -1,0 +1,111 @@
+﻿@page "/masters/edit"
+
+@using Microsoft.EntityFrameworkCore
+@using WorkManage.Data.Models
+@inject IDbContextFactory<WorkManage.Data.ApplicationDbContext> DbFactory
+@inject NavigationManager NavigationManager
+
+<PageTitle>Edit</PageTitle>
+
+<h1>Изменить </h1>
+
+<h4>Мастер </h4>
+<hr />
+@if (Master is null)
+{
+    <p><em>Loading...</em></p>
+}
+else
+{
+    <div class="row">
+        <div class="col-md-4">
+            <EditForm method="post" Model="Master" OnValidSubmit="UpdateMaster" FormName="edit" Enhance>
+             <DataAnnotationsValidator />
+             <ValidationSummary />
+             <input type="hidden" name="Master.Id" value="@Master.Id" />
+             <div class="mb-3">
+                 <label for="lastname" class="form-label">Фамилия:</label>
+                 <InputText id="lastname" @bind-Value="Master.LastName" class="form-control" />
+                 <ValidationMessage For="() => Master.LastName" class="text-danger" />
+             </div>
+             <div class="mb-3">
+                 <label for="firstname" class="form-label">Имя:</label>
+                 <InputText id="firstname" @bind-Value="Master.FirstName" class="form-control" />
+                 <ValidationMessage For="() => Master.FirstName" class="text-danger" />
+             </div>
+             <div class="mb-3">
+                 <label for="patronymic" class="form-label">Отчество:</label>
+                 <InputText id="patronymic" @bind-Value="Master.Patronymic" class="form-control" />
+                 <ValidationMessage For="() => Master.Patronymic" class="text-danger" />
+             </div>
+             <div class="mb-3">
+                 <label for="rank" class="form-label">Разряд:</label>
+                 <InputText id="rank" @bind-Value="Master.Rank" class="form-control" />
+                 <ValidationMessage For="() => Master.Rank" class="text-danger" />
+             </div>
+             <div class="mb-3">
+                 <label for="hiredate" class="form-label">Дата найма:</label>
+                 <InputDate id="hiredate" @bind-Value="Master.HireDate" class="form-control" />
+                 <ValidationMessage For="() => Master.HireDate" class="text-danger" />
+             </div>
+             <button type="submit" class="btn btn-primary">Save</button>
+         </EditForm>
+     </div>
+ </div>
+}
+
+<div>
+    <a href="/masters">Back to List</a>
+</div>
+
+@code {
+    [SupplyParameterFromQuery]
+    public int MasterId { get; set; }
+
+    [SupplyParameterFromForm]
+    public Master? Master { get; set; }
+
+    protected override async Task OnInitializedAsync()
+    {
+        using var context = DbFactory.CreateDbContext();
+        Master ??= await context.Masters.FirstOrDefaultAsync(m => m.Id == MasterId);
+
+        if (Master is null)
+        {
+            NavigationManager.NavigateTo("notfound");
+        }
+    }
+
+    // To protect from overposting attacks, enable the specific properties you want to bind to.
+    // For more details, see https://aka.ms/RazorPagesCRUD.
+    public async Task UpdateMaster()
+    {
+        using (var context = DbFactory.CreateDbContext())
+        {
+            context.Attach(Master!).State = EntityState.Modified;
+            try
+            {
+                await context.SaveChangesAsync();
+            }
+            catch (DbUpdateConcurrencyException)
+            {
+                if (!MasterExists(Master!.Id))
+                {
+                    NavigationManager.NavigateTo("notfound");
+                }
+                else
+                {
+                    throw;
+                }
+            }
+
+            NavigationManager.NavigateTo("/masters");
+        }
+    }
+
+    bool MasterExists(int masterId)
+    {
+        using var context = DbFactory.CreateDbContext();
+        return context.Masters.Any(e => e.Id == masterId);
+    }
+}

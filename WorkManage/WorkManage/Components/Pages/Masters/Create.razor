@@ -1,0 +1,67 @@
+﻿@page "/masters/create"
+
+@using Microsoft.EntityFrameworkCore
+@using WorkManage.Data
+@using WorkManage.Data.Models
+@inject IDbContextFactory<WorkManage.Data.ApplicationDbContext> DbFactory
+@inject NavigationManager NavigationManager
+
+<PageTitle>Create</PageTitle>
+
+<h1>Create</h1>
+
+<h4>Master</h4>
+<hr />
+<div class="row">
+    <div class="col-md-4">
+        <EditForm method="post" Model="Master" OnValidSubmit="AddMaster" FormName="create" Enhance>
+            <DataAnnotationsValidator />
+            <ValidationSummary class="text-danger" />
+            <div class="mb-3">
+                <label for="lastname" class="form-label">Фамилия:</label>
+                <InputText id="lastname" @bind-Value="Master.LastName" class="form-control" />
+                <ValidationMessage For="() => Master.LastName" class="text-danger" />
+            </div>
+            <div class="mb-3">
+                <label for="firstname" class="form-label">Имя:</label>
+                <InputText id="firstname" @bind-Value="Master.FirstName" class="form-control" />
+                <ValidationMessage For="() => Master.FirstName" class="text-danger" />
+            </div>
+            <div class="mb-3">
+                <label for="patronymic" class="form-label">Отчество:</label>
+                <InputText id="patronymic" @bind-Value="Master.Patronymic" class="form-control" />
+                <ValidationMessage For="() => Master.Patronymic" class="text-danger" />
+            </div>
+            <div class="mb-3">
+                <label for="rank" class="form-label">Разряд:</label>
+                <InputText id="rank" @bind-Value="Master.Rank" class="form-control" />
+                <ValidationMessage For="() => Master.Rank" class="text-danger" />
+            </div>
+            <div class="mb-3">
+                <label for="hiredate" class="form-label">Дата найма:</label>
+                <InputDate id="hiredate" @bind-Value="Master.HireDate" class="form-control" />
+                <ValidationMessage For="() => Master.HireDate" class="text-danger" />
+            </div>
+            <button type="submit" class="btn btn-primary">Добавить</button>
+        </EditForm>
+    </div>
+</div>
+
+<div>
+    <a href="/masters">Back to List</a>
+</div>
+
+@code {
+
+    [SupplyParameterFromForm]
+    public Master Master { get; set; } = new();
+
+    // To protect from overposting attacks, see https://aka.ms/RazorPagesCRUD
+    public async Task AddMaster()
+    {
+        using var context = DbFactory.CreateDbContext();
+        context.Masters.Add(Master);
+        await context.SaveChangesAsync();
+        NavigationManager.NavigateTo("/masters");
+    }
+}

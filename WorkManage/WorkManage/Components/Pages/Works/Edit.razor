@@ -1,0 +1,105 @@
+﻿@page "/works/edit"
+
+@using Microsoft.EntityFrameworkCore
+@using WorkManage.Data.Models
+@inject IDbContextFactory<WorkManage.Data.ApplicationDbContext> DbFactory
+@inject NavigationManager NavigationManager
+
+<PageTitle>Edit</PageTitle>
+
+<h1>Edit</h1>
+
+<h4>Work</h4>
+<hr />
+@if (Work is null)
+{
+    <p><em>Loading...</em></p>
+}
+else
+{
+    <div class="row">
+        <div class="col-md-4">
+            <EditForm method="post" Model="Work" OnValidSubmit="UpdateWork" FormName="edit" Enhance>
+             <DataAnnotationsValidator />
+             <ValidationSummary />
+             <input type="hidden" name="Work.Id" value="@Work.Id" />
+             <div class="mb-3">
+                 <label for="workname" class="form-label">Название:</label>
+                 <InputText id="workname" @bind-Value="Work.Name" class="form-control" />
+                 <ValidationMessage For="() => Work.Name" class="text-danger" />
+             </div>
+             <div class="mb-3">
+                 <label for="workmasterid" class="form-label">Id мастера:</label>
+                 <InputNumber id="workmasterid" @bind-Value="Work.MasterId" class="form-control" />
+                 <ValidationMessage For="() => Work.MasterId" class="text-danger" />
+             </div>
+             <div class="mb-3">
+                 <label for="workdayscount" class="form-label">Количество дней:</label>
+                 <InputNumber id="workdayscount" @bind-Value="Work.DaysCount" class="form-control" />
+                 <ValidationMessage For="() => Work.DaysCount" class="text-danger" />
+             </div>
+             <div class="mb-3">
+                 <label for="workprice" class="form-label">Стоимость:</label>
+                 <InputNumber id="workprice" @bind-Value="Work.Price" class="form-control" />
+                 <ValidationMessage For="() => Work.Price" class="text-danger" />
+             </div>
+             <button type="submit" class="btn btn-primary">Save</button>
+         </EditForm>
+     </div>
+ </div>
+}
+
+<div>
+    <a href="/works">Back to List</a>
+</div>
+
+@code {
+    [SupplyParameterFromQuery]
+    public int WorkId { get; set; }
+
+    [SupplyParameterFromForm]
+    public Work? Work { get; set; }
+
+    protected override async Task OnInitializedAsync()
+    {
+        using var context = DbFactory.CreateDbContext();
+        Work ??= await context.Works.FirstOrDefaultAsync(m => m.Id == WorkId);
+
+        if (Work is null)
+        {
+            NavigationManager.NavigateTo("notfound");
+        }
+    }
+
+    // To protect from overposting attacks, enable the specific properties you want to bind to.
+    // For more details, see https://aka.ms/RazorPagesCRUD.
+    public async Task UpdateWork()
+    {
+        using var context = DbFactory.CreateDbContext();
+        context.Attach(Work!).State = EntityState.Modified;
+
+        try
+        {
+            await context.SaveChangesAsync();
+        }
+        catch (DbUpdateConcurrencyException)
+        {
+            if (!WorkExists(Work!.Id))
+            {
+                NavigationManager.NavigateTo("notfound");
+            }
+            else
+            {
+                throw;
+            }
+        }
+
+        NavigationManager.NavigateTo("/works");
+    }
+
+    bool WorkExists(int workId)
+    {
+        using var context = DbFactory.CreateDbContext();
+        return context.Works.Any(e => e.Id == workId);
+    }
+}

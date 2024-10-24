@@ -1,0 +1,40 @@
+﻿@page "/masters"
+
+@using Microsoft.EntityFrameworkCore
+@using Microsoft.AspNetCore.Components.QuickGrid
+@using WorkManage.Data
+@inject IDbContextFactory<WorkManage.Data.ApplicationDbContext> DbFactory
+@implements IAsyncDisposable
+
+<PageTitle>Index</PageTitle>
+
+<h1>Мастера</h1>
+
+<p>
+    <a href="masters/create">Добавить</a>
+</p>
+
+<QuickGrid Class="table" Items="context.Masters">
+    <PropertyColumn Property="master => master.LastName"  Title="Фамилия"/>
+    <PropertyColumn Property="master => master.FirstName" Title="Имя" />
+    <PropertyColumn Property="master => master.Patronymic" Title="Отчество" />
+    <PropertyColumn Property="master => master.Rank" Title="Разряд" />
+    <PropertyColumn Property="master => master.HireDate" Title="Дата найма" />
+
+    <TemplateColumn Context="master">
+        <a href="@($"masters/edit?masterid={master.Id}")">Edit</a> |
+        <a href="@($"masters/details?masterid={master.Id}")">Details</a> |
+        <a href="@($"masters/delete?masterid={master.Id}")">Delete</a>
+    </TemplateColumn>
+</QuickGrid>
+
+@code {
+    ApplicationDbContext context = default!;
+
+    protected override void OnInitialized()
+    {
+        context = DbFactory.CreateDbContext();
+    }
+
+    public async ValueTask DisposeAsync() => await context.DisposeAsync();
+}

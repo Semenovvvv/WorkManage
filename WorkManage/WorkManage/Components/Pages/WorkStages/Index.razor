@@ -1,0 +1,60 @@
+﻿@page "/workstages"
+
+@using Microsoft.EntityFrameworkCore
+@using Microsoft.AspNetCore.Components.QuickGrid
+@using WorkManage.Data
+@using WorkManage.Data.Models
+@inject IDbContextFactory<WorkManage.Data.ApplicationDbContext> DbFactory
+@inject NavigationManager NavigationManager
+@implements IAsyncDisposable
+
+<PageTitle>Index</PageTitle>
+
+<h1>Стадии работы</h1>
+
+<p>
+    <a href="workstages/create">Добавить</a>
+</p>
+
+<QuickGrid Class="table" Items="context.WorkStages.Where(x => x.WorkId == WorkId)">
+    <PropertyColumn Property="workStages => workStages.Work.Name" Title="Название работы"/>
+    <PropertyColumn Property="workStages => workStages.Name" Title="Название стадии" />
+    <PropertyColumn Property="workStages => workStages.Price" Title="Стоимость" />
+
+    <TemplateColumn Context="workStage">
+        <a href="@($"workstages/edit?workstageid={workStage.Id}")">Edit</a> |
+        <a href="@($"workstages/details?workstageid={workStage.Id}")">Details</a> |
+        <a href="@($"workstages/delete?workstageid={workStage.Id}")">Delete</a>
+    </TemplateColumn>
+</QuickGrid>
+
+@code {
+    [SupplyParameterFromQuery]
+    public int? WorkId { get; set; }
+
+    public string? WorkName { get; set; }
+
+    ApplicationDbContext context = default!;
+
+    protected override void OnInitialized()
+    {
+        context = DbFactory.CreateDbContext();
+        if (WorkId == null)
+        {
+            NavigationManager.NavigateTo("not found");
+        }
+        { 
+            Work? work = context.Works.FirstOrDefault(d => d.Id == WorkId);
+
+            if (work == null)
+            {
+                NavigationManager.NavigateTo("not found");
+            }
+
+            WorkName = work?.Name;
+        }
+
+    }
+
+    public async ValueTask DisposeAsync() => await context.DisposeAsync();
+}

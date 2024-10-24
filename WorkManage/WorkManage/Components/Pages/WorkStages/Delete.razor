@@ -1,0 +1,66 @@
+﻿@page "/workstages/delete"
+
+@using Microsoft.EntityFrameworkCore
+@using WorkManage.Data.Models
+@inject IDbContextFactory<WorkManage.Data.ApplicationDbContext> DbFactory
+@inject NavigationManager NavigationManager
+
+
+<PageTitle>Delete</PageTitle>
+
+<h1>Удаление</h1>
+
+<h3>Вы уверены что хотите удалить запись?</h3>
+<div>
+    <h4>Стадия работы</h4>
+    <hr />
+    @if (workStage is null)
+    {
+        <p><em>Loading...</em></p>
+    }
+    else
+    {
+        <dl class="row">
+            <dt class="col-sm-2">Название работы</dt>
+            <dd class="col-sm-10">@workStage.Work.Name</dd>
+        </dl>
+        <dl class="row">
+            <dt class="col-sm-2">Название стадии</dt>
+            <dd class="col-sm-10">@workStage.Name</dd>
+        </dl>
+        <dl class="row">
+            <dt class="col-sm-2">Стоимость</dt>
+            <dd class="col-sm-10">@workStage.Price</dd>
+        </dl>
+        <EditForm method="post" Model="workStage" OnValidSubmit="DeleteWorkStage" FormName="delete" Enhance>
+         <button type="submit" class="btn btn-danger" disabled="@(workStage is null)">Delete</button> |
+         <a href="/rezults">Back to List</a>
+     </EditForm>
+    }
+</div>
+
+@code {
+    WorkStage? workStage;
+
+    [SupplyParameterFromQuery]
+    public int WorkStageId { get; set; }
+
+    protected override async Task OnInitializedAsync()
+    {
+        using var context = DbFactory.CreateDbContext();
+        workStage = await context.WorkStages.FirstOrDefaultAsync(m => m.Id == WorkStageId);
+
+        if (workStage is null)
+        {
+            NavigationManager.NavigateTo("notfound");
+        }
+    }
+
+    public async Task DeleteWorkStage()
+    {
+        using var context = DbFactory.CreateDbContext();
+        context.WorkStages.Remove(workStage!);
+        await context.SaveChangesAsync();
+        NavigationManager.NavigateTo("/workstages");
+    }
+}

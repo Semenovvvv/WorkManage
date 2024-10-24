@@ -1,0 +1,62 @@
+﻿@page "/works/create"
+
+@using Microsoft.EntityFrameworkCore
+@using WorkManage.Data
+@using WorkManage.Data.Models
+@inject IDbContextFactory<WorkManage.Data.ApplicationDbContext> DbFactory
+@inject NavigationManager NavigationManager
+
+<PageTitle>Create</PageTitle>
+
+<h1>Create</h1>
+
+<h4>Work</h4>
+<hr />
+<div class="row">
+    <div class="col-md-4">
+        <EditForm method="post" Model="Work" OnValidSubmit="AddWork" FormName="create" Enhance>
+            <DataAnnotationsValidator />
+            <ValidationSummary class="text-danger" />
+            <div class="mb-3">
+                <label for="masterid" class="form-label">MasterId:</label>
+                <InputNumber id="masterid" @bind-Value="Work.MasterId" class="form-control" />
+                <ValidationMessage For="() => Work.MasterId" class="text-danger" />
+            </div>
+            <div class="mb-3">
+                <label for="name" class="form-label">Название:</label>
+                <InputText id="name" @bind-Value="Work.Name" class="form-control" />
+                <ValidationMessage For="() => Work.Name" class="text-danger" />
+            </div>
+            <div class="mb-3">
+                <label for="dayscount" class="form-label">Количество дней:</label>
+                <InputNumber id="dayscount" @bind-Value="Work.DaysCount" class="form-control" />
+                <ValidationMessage For="() => Work.DaysCount" class="text-danger" />
+            </div>
+            <div class="mb-3">
+                <label for="price" class="form-label">Стоимость:</label>
+                <InputNumber id="price" @bind-Value="Work.Price" class="form-control" />
+                <ValidationMessage For="() => Work.Price" class="text-danger" />
+            </div>
+            <button type="submit" class="btn btn-primary">Create</button>
+        </EditForm>
+    </div>
+</div>
+
+<div>
+    <a href="/works">Back to List</a>
+</div>
+
+@code {
+
+    [SupplyParameterFromForm]
+    public Work Work { get; set; } = new();
+
+    // To protect from overposting attacks, see https://aka.ms/RazorPagesCRUD
+    public async Task AddWork()
+    {
+        using var context = DbFactory.CreateDbContext();
+        context.Works.Add(Work);
+        await context.SaveChangesAsync();
+        NavigationManager.NavigateTo("/works");
+    }
+}

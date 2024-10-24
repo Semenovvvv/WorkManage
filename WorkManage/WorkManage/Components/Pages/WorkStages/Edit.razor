@@ -1,0 +1,100 @@
+﻿@page "/workstages/edit"
+
+@using Microsoft.EntityFrameworkCore
+@using WorkManage.Data.Models
+@inject IDbContextFactory<WorkManage.Data.ApplicationDbContext> DbFactory
+@inject NavigationManager NavigationManager
+
+<PageTitle>Edit</PageTitle>
+
+<h1>Edit</h1>
+
+<h4>Work Stage</h4>
+<hr />
+@if (WorkStage is null)
+{
+    <p><em>Loading...</em></p>
+}
+else
+{
+    <div class="row">
+        <div class="col-md-4">
+            <EditForm method="post" Model="WorkStage" OnValidSubmit="UpdateWorkStage" FormName="edit" Enhance>
+             <DataAnnotationsValidator />
+             <ValidationSummary />
+             <input type="hidden" name="WorkStage.Id" value="@WorkStage.Id" />
+            <div class="mb-3">
+            <label for="workstagename" class="form-label">UchenikId:</label>
+                 <InputText id="workstagename" @bind-Value="WorkStage.Name" class="form-control" />
+                 <ValidationMessage For="() => WorkStage.Name" class="text-danger" />
+            </div>
+            <div class="mb-3">
+            <label for="workstageworkid" class="form-label">Id работы:</label>
+                 <InputNumber id="workstageworkid" @bind-Value="WorkStage.WorkId" class="form-control" />
+                 <ValidationMessage For="() => WorkStage.WorkId" class="text-danger" />
+            </div>
+            <div class="mb-3">
+            <label for="workstageprice" class="form-label">Стоимость стадии:</label>
+                 <InputNumber id="workstageprice" @bind-Value="WorkStage.Price" class="form-control" />
+                 <ValidationMessage For="() => WorkStage.Price" class="text-danger" />
+            </div>
+             <button type="submit" class="btn btn-primary">Save</button>
+         </EditForm>
+     </div>
+ </div>
+}
+
+<div>
+    <a href="/workstages">Back to List</a>
+</div>
+
+@code {
+    [SupplyParameterFromQuery]
+    public int WorkStageId { get; set; }
+
+    [SupplyParameterFromForm]
+    public WorkStage? WorkStage { get; set; }
+
+    protected override async Task OnInitializedAsync()
+    {
+        using var context = DbFactory.CreateDbContext();
+        WorkStage ??= await context.WorkStages.FirstOrDefaultAsync(m => m.Id == WorkStageId);
+
+        if (WorkStage is null)
+        {
+            NavigationManager.NavigateTo("notfound");
+        }
+    }
+
+    // To protect from overposting attacks, enable the specific properties you want to bind to.
+    // For more details, see https://aka.ms/RazorPagesCRUD.
+    public async Task UpdateWorkStage()
+    {
+        using var context = DbFactory.CreateDbContext();
+        context.Attach(WorkStage!).State = EntityState.Modified;
+
+        try
+        {
+            await context.SaveChangesAsync();
+        }
+        catch (DbUpdateConcurrencyException)
+        {
+            if (!WorkStageExists(WorkStage!.Id))
+            {
+                NavigationManager.NavigateTo("notfound");
+            }
+            else
+            {
+                throw;
+            }
+        }
+
+        NavigationManager.NavigateTo("/workstages");
+    }
+
+    bool WorkStageExists(int workStageId)
+    {
+        using var context = DbFactory.CreateDbContext();
+        return context.WorkStages.Any(e => e.Id == workStageId);
+    }
+}
