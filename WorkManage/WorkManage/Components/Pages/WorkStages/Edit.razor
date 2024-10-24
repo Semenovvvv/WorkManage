@@ -20,33 +20,33 @@ else
     <div class="row">
         <div class="col-md-4">
             <EditForm method="post" Model="WorkStage" OnValidSubmit="UpdateWorkStage" FormName="edit" Enhance>
-             <DataAnnotationsValidator />
-             <ValidationSummary />
-             <input type="hidden" name="WorkStage.Id" value="@WorkStage.Id" />
-            <div class="mb-3">
-            <label for="workstagename" class="form-label">UchenikId:</label>
-                 <InputText id="workstagename" @bind-Value="WorkStage.Name" class="form-control" />
-                 <ValidationMessage For="() => WorkStage.Name" class="text-danger" />
-            </div>
-            <div class="mb-3">
-            <label for="workstageworkid" class="form-label">Id работы:</label>
-                 <InputNumber id="workstageworkid" @bind-Value="WorkStage.WorkId" class="form-control" />
-                 <ValidationMessage For="() => WorkStage.WorkId" class="text-danger" />
-            </div>
-            <div class="mb-3">
-            <label for="workstageprice" class="form-label">Стоимость стадии:</label>
-                 <InputNumber id="workstageprice" @bind-Value="WorkStage.Price" class="form-control" />
-                 <ValidationMessage For="() => WorkStage.Price" class="text-danger" />
-            </div>
-             <button type="submit" class="btn btn-primary">Save</button>
-         </EditForm>
-     </div>
- </div>
-}
+                <DataAnnotationsValidator />
+                <ValidationSummary />
+                <input type="hidden" name="WorkStage.Id" value="@WorkStage.Id" />
+                <div class="mb-3">
+                    <label for="workstagename" class="form-label">UchenikId:</label>
+                    <InputText id="workstagename" @bind-Value="WorkStage.Name" class="form-control" />
+                    <ValidationMessage For="() => WorkStage.Name" class="text-danger" />
+                </div>
+                <div class="mb-3">
+                    <label for="workstageworkid" class="form-label">Id работы:</label>
+                    <InputNumber id="workstageworkid" @bind-Value="WorkStage.WorkId" class="form-control" />
+                    <ValidationMessage For="() => WorkStage.WorkId" class="text-danger" />
+                </div>
+                <div class="mb-3">
+                    <label for="workstageprice" class="form-label">Стоимость стадии:</label>
+                    <InputNumber id="workstageprice" @bind-Value="WorkStage.Price" class="form-control" />
+                    <ValidationMessage For="() => WorkStage.Price" class="text-danger" />
+                </div>
+                <button type="submit" class="btn btn-primary">Save</button>
+            </EditForm>
+        </div>
+    </div>
 
-<div>
-    <a href="/workstages">Back to List</a>
-</div>
+    <div>
+        <a href="@($"/workstages?workid={WorkStage.Work.Id}")">Back to List</a>
+    </div>
+}
 
 @code {
     [SupplyParameterFromQuery]
@@ -89,7 +89,7 @@ else
             }
         }
 
-        NavigationManager.NavigateTo("/workstages");
+        NavigationManager.NavigateTo($"/workstages?workid={WorkStage.Work.Id}");
     }
 
     bool WorkStageExists(int workStageId)

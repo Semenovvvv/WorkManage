@@ -13,7 +13,7 @@
 <h1>Стадии работы</h1>
 
 <p>
-    <a href="workstages/create">Добавить</a>
+    <a href=@($"workstages/create?workid={work.Id}")>Добавить</a>
 </p>
 
 <QuickGrid Class="table" Items="context.WorkStages.Where(x => x.WorkId == WorkId)">
@@ -22,15 +22,17 @@
     <PropertyColumn Property="workStages => workStages.Price" Title="Стоимость" />
 
     <TemplateColumn Context="workStage">
-        <a href="@($"workstages/edit?workstageid={workStage.Id}")">Edit</a> |
-        <a href="@($"workstages/details?workstageid={workStage.Id}")">Details</a> |
-        <a href="@($"workstages/delete?workstageid={workStage.Id}")">Delete</a>
+        <a href="@($"workstages/edit?workstageid={workStage.Id}")">Изменить</a> |
+        <a href="@($"workstages/details?workstageid={workStage.Id}")">Подробно</a> |
+        <a href="@($"workstages/delete?workstageid={workStage.Id}")">Удалить</a>
     </TemplateColumn>
 </QuickGrid>
 
 @code {
     [SupplyParameterFromQuery]
     public int? WorkId { get; set; }
+
+    Work? work { get; set; }
 
     public string? WorkName { get; set; }
 
@@ -44,7 +46,7 @@
             NavigationManager.NavigateTo("not found");
         }
         { 
-            Work? work = context.Works.FirstOrDefault(d => d.Id == WorkId);
+            work = context.Works.FirstOrDefault(d => d.Id == WorkId);
 
             if (work == null)
             {

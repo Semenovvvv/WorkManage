@@ -34,7 +34,7 @@
         </dl>
         <EditForm method="post" Model="workStage" OnValidSubmit="DeleteWorkStage" FormName="delete" Enhance>
          <button type="submit" class="btn btn-danger" disabled="@(workStage is null)">Delete</button> |
-         <a href="/rezults">Back to List</a>
+            <a href=@(($"/workstages?workid={workStage.Work.Id}"))>Back to List</a>
      </EditForm>
     }
 </div>
@@ -61,6 +61,6 @@
         using var context = DbFactory.CreateDbContext();
         context.WorkStages.Remove(workStage!);
         await context.SaveChangesAsync();
-        NavigationManager.NavigateTo("/workstages");
+        NavigationManager.NavigateTo($"/workstages?workid={workStage.Work.Id}");
     }
 }
