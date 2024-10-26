@@ -29,11 +29,6 @@ else
                  <ValidationMessage For="() => Work.Name" class="text-danger" />
              </div>
              <div class="mb-3">
-                 <label for="workmasterid" class="form-label">Id мастера:</label>
-                 <InputNumber id="workmasterid" @bind-Value="Work.MasterId" class="form-control" />
-                 <ValidationMessage For="() => Work.MasterId" class="text-danger" />
-             </div>
-             <div class="mb-3">
                  <label for="workdayscount" class="form-label">Количество дней:</label>
                  <InputNumber id="workdayscount" @bind-Value="Work.DaysCount" class="form-control" />
                  <ValidationMessage For="() => Work.DaysCount" class="text-danger" />
@@ -50,7 +45,7 @@ else
 }
 
 <div>
-    <a href="/works">Back to List</a>
+    <a href="@($"works/?masterid={GetMasterId(WorkId)}")">Back to List</a>
 </div>
 
 @code {
@@ -69,6 +64,13 @@ else
         {
             NavigationManager.NavigateTo("notfound");
         }
+    }
+
+    public int GetMasterId(int WorkId)
+    {
+        using var context = DbFactory.CreateDbContext();
+        var work = context.Works.FirstOrDefault(x => x.Id == WorkId);
+        return work.MasterId;
     }
 
     // To protect from overposting attacks, enable the specific properties you want to bind to.
@@ -94,7 +96,7 @@ else
             }
         }
 
-        NavigationManager.NavigateTo("/works");
+        NavigationManager.NavigateTo($"works/?masterid={Work.MasterId}");
     }
 
     bool WorkExists(int workId)

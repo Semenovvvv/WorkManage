@@ -16,6 +16,10 @@
     <a href=@($"workstages/create?workid={work.Id}")>Добавить</a>
 </p>
 
+<div>
+    <a href="@($"works/?masterid={GetMasterId((int)WorkId)}")">Back to List</a>
+</div>
+
 <QuickGrid Class="table" Items="context.WorkStages.Where(x => x.WorkId == WorkId)">
     <PropertyColumn Property="workStages => workStages.Work.Name" Title="Название работы"/>
     <PropertyColumn Property="workStages => workStages.Name" Title="Название стадии" />
@@ -55,7 +59,12 @@
 
             WorkName = work?.Name;
         }
+    }
 
+    public int GetMasterId(int workId)
+    {
+        using var context = DbFactory.CreateDbContext();
+        return context.Works.FirstOrDefault(x => x.Id == workId).MasterId;
     }
 
     public async ValueTask DisposeAsync() => await context.DisposeAsync();

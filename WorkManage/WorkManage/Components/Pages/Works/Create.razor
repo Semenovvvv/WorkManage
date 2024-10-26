@@ -17,11 +17,11 @@
         <EditForm method="post" Model="Work" OnValidSubmit="AddWork" FormName="create" Enhance>
             <DataAnnotationsValidator />
             <ValidationSummary class="text-danger" />
-            <div class="mb-3">
+           @*  <div class="mb-3">
                 <label for="masterid" class="form-label">MasterId:</label>
                 <InputNumber id="masterid" @bind-Value="Work.MasterId" class="form-control" />
                 <ValidationMessage For="() => Work.MasterId" class="text-danger" />
-            </div>
+            </div> *@
             <div class="mb-3">
                 <label for="name" class="form-label">Название:</label>
                 <InputText id="name" @bind-Value="Work.Name" class="form-control" />
@@ -43,20 +43,31 @@
 </div>
 
 <div>
-    <a href="/works">Back to List</a>
+    <a href=@($"works/?masterid={Master.Id}")>Back to List</a>
 </div>
 
 @code {
+    [SupplyParameterFromQuery]
+    int? MasterId { get; set; }
+
+    Master? Master { get; set; }
 
     [SupplyParameterFromForm]
     public Work Work { get; set; } = new();
+
+    protected override void OnInitialized()
+    {
+        using var context = DbFactory.CreateDbContext();
+        Master = context.Masters.FirstOrDefault(x => x.Id == MasterId);
+    }
 
     // To protect from overposting attacks, see https://aka.ms/RazorPagesCRUD
     public async Task AddWork()
     {
         using var context = DbFactory.CreateDbContext();
+        Work.MasterId = Master.Id;
         context.Works.Add(Work);
         await context.SaveChangesAsync();
-        NavigationManager.NavigateTo("/works");
+        NavigationManager.NavigateTo($"works/?masterid={Master.Id}");
     }
 }

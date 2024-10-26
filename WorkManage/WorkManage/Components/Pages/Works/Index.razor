@@ -3,6 +3,7 @@
 @using Microsoft.EntityFrameworkCore
 @using Microsoft.AspNetCore.Components.QuickGrid
 @using WorkManage.Data
+@using WorkManage.Data.Models
 @inject IDbContextFactory<WorkManage.Data.ApplicationDbContext> DbFactory
 @implements IAsyncDisposable
 
@@ -11,10 +12,14 @@
 <h1>Работы</h1>
 
 <p>
-    <a href="works/create">Добавить</a>
+    <a href="@($"works/create?masterid={MasterId}")">Добавить</a>
 </p>
 
-<QuickGrid Class="table" Items="context.Works">
+<div>
+    <a href="@($"masters")">Back to List</a>
+</div>
+
+<QuickGrid Class="table" Items="context.Works.Where(x => x.MasterId == MasterId)">
     <PropertyColumn Property="work => work.Master.LastName + ' ' + work.Master.FirstName + ' ' + work.Master.Patronymic" Title="ФИО мастера" />
     <PropertyColumn Property="work => work.Name" Title="Название" />
 
@@ -27,11 +32,17 @@
 </QuickGrid>
 
 @code {
+    [SupplyParameterFromQuery]
+    int? MasterId { get; set; }
+
+    Master Master { get; set; }
+
     ApplicationDbContext context = default!;
 
     protected override void OnInitialized()
     {
         context = DbFactory.CreateDbContext();
+        Master = context.Masters.FirstOrDefault(x => x.Id == MasterId);
     }
 
     public async ValueTask DisposeAsync() => await context.DisposeAsync();

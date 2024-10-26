@@ -110,12 +110,11 @@ else
 
         isLoading = false;
     }
+
     public async Task GetDataTableFromExcelAsync(FileStream file)
     {
         using (var context = DbFactory.CreateDbContext())
         {
-
-
             using (XLWorkbook workbook = new XLWorkbook(file))
             {
                 var passwordHasher = new PasswordHasher<ApplicationUser>();
@@ -162,10 +161,8 @@ else
                                 workStage.Price = int.Parse(row.Cell(table.FindColumn(c => c.FirstCell().Value.ToString() == "Price").RangeAddress.FirstAddress.ColumnNumber).Value.ToString());
 
                                 WorkStages.Add(workStage);
-
                             }
                         }
-
 
                         errindexrow = 1;
                         if (worksheet.Name == "Masters")
@@ -204,10 +201,17 @@ else
                         master.Id = 0;
                     }
 
-
                     using (var transaction = context.Database.BeginTransaction())
                     {
                         context.AddRange(Masters);
+
+                        await context.SaveChangesAsync();
+
+                        transaction.Commit();
+                    }
+
+                    using (var transaction = context.Database.BeginTransaction())
+                    {
                         context.AddRange(Works);
 
                         await context.SaveChangesAsync();
@@ -230,9 +234,7 @@ else
                         ErrorMessage = "Ошибка в импорте в таблице " + errworksheet + ", строка - " + errindexrow.ToString();
                     ErrorMessage = exception.Message;
                 }
-
             }
         }
-
     }
 }

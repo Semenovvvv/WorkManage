@@ -22,6 +22,7 @@
     <PropertyColumn Property="master => master.HireDate" Title="Дата найма" />
 
     <TemplateColumn Context="master">
+        <a href="@($"works/?masterid={master.Id}")">Работы</a> |
         <a href="@($"masters/edit?masterid={master.Id}")">Изменить</a> |
         <a href="@($"masters/details?masterid={master.Id}")">Подробно</a> |
         <a href="@($"masters/delete?masterid={master.Id}")">Удалить</a>
