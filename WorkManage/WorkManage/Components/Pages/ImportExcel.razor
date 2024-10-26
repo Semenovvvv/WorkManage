@@ -57,7 +57,7 @@ else
     DateTime? StartTime;
     DateTime? EndTime;
 
-    public List<Master> Masters = new();
+    public List<ApplicationUser> Masters = new();
     public List<Work> Works = new();
     public List<WorkStage> WorkStages = new();
 
@@ -134,7 +134,7 @@ else
                                 var range = worksheet.RangeUsed();
                                 var table = range!.AsTable();
                                 work.Id = int.Parse(row.Cell(table.FindColumn(c => c.FirstCell().Value.ToString() == "WorkId").RangeAddress.FirstAddress.ColumnNumber).Value.ToString());
-                                work.MasterId = int.Parse(row.Cell(table.FindColumn(c => c.FirstCell().Value.ToString() == "MasterId").RangeAddress.FirstAddress.ColumnNumber).Value.ToString());
+                                work.MasterId = row.Cell(table.FindColumn(c => c.FirstCell().Value.ToString() == "MasterId").RangeAddress.FirstAddress.ColumnNumber).Value.ToString();
                                 work.Price = int.Parse(row.Cell(table.FindColumn(c => c.FirstCell().Value.ToString() == "Price").RangeAddress.FirstAddress.ColumnNumber).Value.ToString());
                                 work.DaysCount = int.Parse(row.Cell(table.FindColumn(c => c.FirstCell().Value.ToString() == "DaysCount").RangeAddress.FirstAddress.ColumnNumber).Value.ToString());
                                 work.Name = row.Cell(table.FindColumn(c => c.FirstCell().Value.ToString() == "Name").RangeAddress.FirstAddress.ColumnNumber).Value.ToString();
@@ -170,11 +170,11 @@ else
                             foreach (IXLRow row in worksheet.RowsUsed().Skip(1))
                             {
                                 errindexrow++;
-                                var master = new Master();
+                                var master = new ApplicationUser();
                                 var range = worksheet.RangeUsed();
                                 var table = range!.AsTable();
 
-                                master.Id = int.Parse(row.Cell(table.FindColumn(c => c.FirstCell().Value.ToString() == "MasterId").RangeAddress.FirstAddress.ColumnNumber).Value.ToString());
+                                master.Id = row.Cell(table.FindColumn(c => c.FirstCell().Value.ToString() == "MasterId").RangeAddress.FirstAddress.ColumnNumber).Value.ToString();
                                 master.LastName = row.Cell(table.FindColumn(c => c.FirstCell().Value.ToString() == "LastName").RangeAddress.FirstAddress.ColumnNumber).Value.ToString();
                                 master.FirstName = row.Cell(table.FindColumn(c => c.FirstCell().Value.ToString() == "FirstName").RangeAddress.FirstAddress.ColumnNumber).Value.ToString();
                                 master.Patronymic = row.Cell(table.FindColumn(c => c.FirstCell().Value.ToString() == "Patronymic").RangeAddress.FirstAddress.ColumnNumber).Value.ToString();
@@ -198,7 +198,7 @@ else
 
                     foreach (var master in Masters)
                     {
-                        master.Id = 0;
+                        master.Id = string.Empty;
                     }
 
                     using (var transaction = context.Database.BeginTransaction())

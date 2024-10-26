@@ -45,7 +45,7 @@ else
 
 @code {
     [SupplyParameterFromQuery]
-    public int WorkStageId { get; set; }
+    public int? WorkStageId { get; set; }
 
     [SupplyParameterFromForm]
     public WorkStage? WorkStage { get; set; }
@@ -87,7 +87,7 @@ else
         NavigationManager.NavigateTo($"/workstages?workid={WorkStage.Work.Id}");
     }
 
-    bool WorkStageExists(int workStageId)
+    bool WorkStageExists(int? workStageId)
     {
         using var context = DbFactory.CreateDbContext();
         return context.WorkStages.Any(e => e.Id == workStageId);

@@ -50,7 +50,7 @@ else
 
 @code {
     [SupplyParameterFromQuery]
-    public int WorkId { get; set; }
+    public int? WorkId { get; set; }
 
     [SupplyParameterFromForm]
     public Work? Work { get; set; }
@@ -66,7 +66,7 @@ else
         }
     }
 
-    public int GetMasterId(int WorkId)
+    public string GetMasterId(int? WorkId)
     {
         using var context = DbFactory.CreateDbContext();
         var work = context.Works.FirstOrDefault(x => x.Id == WorkId);
@@ -99,7 +99,7 @@ else
         NavigationManager.NavigateTo($"works/?masterid={Work.MasterId}");
     }
 
-    bool WorkExists(int workId)
+    bool WorkExists(int? workId)
     {
         using var context = DbFactory.CreateDbContext();
         return context.Works.Any(e => e.Id == workId);

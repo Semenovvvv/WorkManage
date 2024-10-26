@@ -48,9 +48,9 @@
 
 @code {
     [SupplyParameterFromQuery]
-    int? MasterId { get; set; }
+    string? MasterId { get; set; }
 
-    Master? Master { get; set; }
+    ApplicationUser? Master { get; set; }
 
     [SupplyParameterFromForm]
     public Work Work { get; set; } = new();
@@ -58,7 +58,7 @@
     protected override void OnInitialized()
     {
         using var context = DbFactory.CreateDbContext();
-        Master = context.Masters.FirstOrDefault(x => x.Id == MasterId);
+        Master = context.Users.FirstOrDefault(x => x.Id == MasterId);
     }
 
     // To protect from overposting attacks, see https://aka.ms/RazorPagesCRUD

@@ -1,4 +1,5 @@
 ﻿@page "/masters/details"
+@attribute [Authorize(Roles = "Administrator")]
 
 @using Microsoft.EntityFrameworkCore
 @using WorkManage.Data
@@ -41,15 +42,15 @@
 </div>
 
 @code {
-    Master? master;
+    ApplicationUser? master;
 
     [SupplyParameterFromQuery]
-    public int MasterId { get; set; }
+    public string MasterId { get; set; }
 
     protected override async Task OnInitializedAsync()
     {
         using var context = DbFactory.CreateDbContext();
-        master = await context.Masters.FirstOrDefaultAsync(m => m.Id == MasterId);
+        master = await context.Users.FirstOrDefaultAsync(m => m.Id == MasterId);
 
         if (master is null)
         {

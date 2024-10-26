@@ -61,7 +61,7 @@
         }
     }
 
-    public int GetMasterId(int workId)
+    public string GetMasterId(int workId)
     {
         using var context = DbFactory.CreateDbContext();
         return context.Works.FirstOrDefault(x => x.Id == workId).MasterId;

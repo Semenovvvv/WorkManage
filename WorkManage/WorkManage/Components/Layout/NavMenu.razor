@@ -12,30 +12,32 @@
 
 <div class="nav-scrollable" onclick="document.querySelector('.navbar-toggler').click()">
     <nav class="flex-column">
-        <div class="nav-item px-3">
-            <NavLink class="nav-link" href="" Match="NavLinkMatch.All">
-                <span class="bi bi-house-door-fill-nav-menu" aria-hidden="true"></span> Домашняя страница
-            </NavLink>
-        </div>
+        <AuthorizeView Roles="Administrator">
+            <div class="nav-item px-3">
+                <NavLink class="nav-link" href="" Match="NavLinkMatch.All">
+                    <span class="bi bi-house-door-fill-nav-menu" aria-hidden="true"></span> Домашняя страница
+                </NavLink>
+            </div>
 
-        <div class="nav-item px-3">
-            <NavLink class="nav-link" href="/masters">
-                <span class="bi bi-plus-square-fill-nav-menu" aria-hidden="true"></span> Мастера
-            </NavLink>
-        </div>
+            <div class="nav-item px-3">
+                <NavLink class="nav-link" href="/masters">
+                    <span class="bi bi-plus-square-fill-nav-menu" aria-hidden="true"></span> Мастера
+                </NavLink>
+            </div>
 
-        <div class="nav-item px-3">
-            <NavLink class="nav-link" href="/exportexcel">
-                <span class="bi bi-plus-square-fill-nav-menu" aria-hidden="true"></span> Экспорт в Excel
-            </NavLink>
-        </div>
+            <div class="nav-item px-3">
+                <NavLink class="nav-link" href="/exportexcel">
+                    <span class="bi bi-plus-square-fill-nav-menu" aria-hidden="true"></span> Экспорт в Excel
+                </NavLink>
+            </div>
 
-        <div class="nav-item px-3">
-            <NavLink class="nav-link" href="/importexcel">
-                <span class="bi bi-plus-square-fill-nav-menu" aria-hidden="true"></span> Импорт в Excel
-            </NavLink>
-        </div>
-
+            <div class="nav-item px-3">
+                <NavLink class="nav-link" href="/importexcel">
+                    <span class="bi bi-plus-square-fill-nav-menu" aria-hidden="true"></span> Импорт в Excel
+                </NavLink>
+            </div>
+        </AuthorizeView>
+        
         <AuthorizeView>
             <Authorized>
                 <div class="nav-item px-3">

@@ -2,6 +2,7 @@
 using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 using WorkManage.Data;
@@ -11,9 +12,11 @@ using WorkManage.Data;
 namespace WorkManage.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20241026201528_ChangeMasterToApplicationUser")]
+    partial class ChangeMasterToApplicationUser
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -174,12 +177,14 @@ namespace WorkManage.Migrations
                         .HasColumnType("boolean");
 
                     b.Property<string>("FirstName")
+                        .IsRequired()
                         .HasColumnType("text");
 
-                    b.Property<DateTime?>("HireDate")
-                        .HasColumnType("timestamp");
+                    b.Property<DateTime>("HireDate")
+                        .HasColumnType("timestamp with time zone");
 
                     b.Property<string>("LastName")
+                        .IsRequired()
                         .HasColumnType("text");
 
                     b.Property<bool>("LockoutEnabled")
@@ -200,6 +205,7 @@ namespace WorkManage.Migrations
                         .HasColumnType("text");
 
                     b.Property<string>("Patronymic")
+                        .IsRequired()
                         .HasColumnType("text");
 
                     b.Property<string>("PhoneNumber")
@@ -209,6 +215,7 @@ namespace WorkManage.Migrations
                         .HasColumnType("boolean");
 
                     b.Property<string>("Rank")
+                        .IsRequired()
                         .HasColumnType("text");
 
                     b.Property<string>("SecurityStamp")
@@ -235,13 +242,13 @@ namespace WorkManage.Migrations
 
             modelBuilder.Entity("WorkManage.Data.Models.Work", b =>
                 {
-                    b.Property<int?>("Id")
+                    b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("integer");
 
-                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int?>("Id"));
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
 
-                    b.Property<int?>("DaysCount")
+                    b.Property<int>("DaysCount")
                         .HasColumnType("integer");
 
                     b.Property<string>("MasterId")
@@ -249,9 +256,10 @@ namespace WorkManage.Migrations
                         .HasColumnType("text");
 
                     b.Property<string>("Name")
+                        .IsRequired()
                         .HasColumnType("text");
 
-                    b.Property<decimal?>("Price")
+                    b.Property<decimal>("Price")
                         .HasColumnType("numeric");
 
                     b.HasKey("Id");
@@ -263,19 +271,20 @@ namespace WorkManage.Migrations
 
             modelBuilder.Entity("WorkManage.Data.Models.WorkStage", b =>
                 {
-                    b.Property<int?>("Id")
+                    b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("integer");
 
-                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int?>("Id"));
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
 
                     b.Property<string>("Name")
+                        .IsRequired()
                         .HasColumnType("text");
 
-                    b.Property<decimal?>("Price")
+                    b.Property<decimal>("Price")
                         .HasColumnType("numeric");
 
-                    b.Property<int?>("WorkId")
+                    b.Property<int>("WorkId")
                         .HasColumnType("integer");
 
                     b.HasKey("Id");
@@ -351,7 +360,9 @@ namespace WorkManage.Migrations
                 {
                     b.HasOne("WorkManage.Data.Models.Work", "Work")
                         .WithMany("WorkStages")
-                        .HasForeignKey("WorkId");
+                        .HasForeignKey("WorkId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
 
                     b.Navigation("Work");
                 });

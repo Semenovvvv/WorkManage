@@ -45,7 +45,7 @@
         foreach (var work in context.Works)
         {
             worksheetWorks.Cell(i, 1).Value = work.Id;
-            worksheetWorks.Cell(i, 2).Value = work.MasterId;
+            worksheetWorks.Cell(i, 2).Value = work.MasterId.ToString();
             worksheetWorks.Cell(i, 3).Value = work.Price;
             worksheetWorks.Cell(i, 4).Value = work.DaysCount;
             worksheetWorks.Cell(i, 5).Value = work.Name;
@@ -83,9 +83,9 @@
 
         i = 2;
 
-        foreach (var master in context.Masters)
+        foreach (var master in context.Users)
         {
-            worksheetMasters.Cell(i, 1).Value = master.Id;
+            worksheetMasters.Cell(i, 1).Value = master.Id.ToString();
             worksheetMasters.Cell(i, 2).Value = master.LastName;
             worksheetMasters.Cell(i, 3).Value = master.FirstName;
             worksheetMasters.Cell(i, 4).Value = master.Patronymic;

@@ -1,3 +1,4 @@
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 using WorkManage.Data.Configurations;
@@ -7,7 +8,7 @@ namespace WorkManage.Data
 {
     public class ApplicationDbContext(DbContextOptions<ApplicationDbContext> options) : IdentityDbContext<ApplicationUser>(options)
     {
-        public DbSet<Master> Masters {  get; set; }
+        //public DbSet<Master> Masters {  get; set; }
         public DbSet<Work> Works { get; set; }
         public DbSet<WorkStage> WorkStages { get; set; }
 

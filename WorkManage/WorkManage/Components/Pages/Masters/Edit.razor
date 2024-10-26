@@ -1,4 +1,5 @@
 ﻿@page "/masters/edit"
+@attribute [Authorize(Roles = "Administrator")]
 
 @using Microsoft.EntityFrameworkCore
 @using WorkManage.Data.Models
@@ -60,15 +61,15 @@ else
 
 @code {
     [SupplyParameterFromQuery]
-    public int MasterId { get; set; }
+    public string MasterId { get; set; }
 
     [SupplyParameterFromForm]
-    public Master? Master { get; set; }
+    public ApplicationUser? Master { get; set; }
 
     protected override async Task OnInitializedAsync()
     {
         using var context = DbFactory.CreateDbContext();
-        Master ??= await context.Masters.FirstOrDefaultAsync(m => m.Id == MasterId);
+        Master ??= await context.Users.FirstOrDefaultAsync(m => m.Id == MasterId);
 
         if (Master is null)
         {
@@ -103,9 +104,9 @@ else
         }
     }
 
-    bool MasterExists(int masterId)
+    bool MasterExists(string masterId)
     {
         using var context = DbFactory.CreateDbContext();
-        return context.Masters.Any(e => e.Id == masterId);
+        return context.Users.Any(e => e.Id == masterId);
     }
 }

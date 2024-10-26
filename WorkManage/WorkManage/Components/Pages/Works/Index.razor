@@ -33,16 +33,16 @@
 
 @code {
     [SupplyParameterFromQuery]
-    int? MasterId { get; set; }
+    string? MasterId { get; set; }
 
-    Master Master { get; set; }
+    ApplicationUser Master { get; set; }
 
     ApplicationDbContext context = default!;
 
     protected override void OnInitialized()
     {
         context = DbFactory.CreateDbContext();
-        Master = context.Masters.FirstOrDefault(x => x.Id == MasterId);
+        Master = context.Users.FirstOrDefault(x => x.Id == MasterId);
     }
 
     public async ValueTask DisposeAsync() => await context.DisposeAsync();

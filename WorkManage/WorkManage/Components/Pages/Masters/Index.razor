@@ -1,4 +1,5 @@
 ﻿@page "/masters"
+@attribute [Authorize(Roles = "Administrator")]
 
 @using Microsoft.EntityFrameworkCore
 @using Microsoft.AspNetCore.Components.QuickGrid
@@ -14,7 +15,7 @@
     <a href="masters/create">Добавить</a>
 </p>
 
-<QuickGrid Class="table" Items="context.Masters">
+<QuickGrid Class="table" Items="context.Users.Where(u => u.FirstName != null)">
     <PropertyColumn Property="master => master.LastName"  Title="Фамилия"/>
     <PropertyColumn Property="master => master.FirstName" Title="Имя" />
     <PropertyColumn Property="master => master.Patronymic" Title="Отчество" />

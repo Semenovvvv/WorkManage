@@ -1,4 +1,5 @@
 ﻿@page "/masters/delete"
+@attribute [Authorize(Roles = "Administrator")]
 
 @using Microsoft.EntityFrameworkCore
 @using WorkManage.Data.Models
@@ -48,15 +49,15 @@
 </div>
 
 @code {
-    Master? master;
+    ApplicationUser? master;
 
     [SupplyParameterFromQuery]
-    public int MasterId { get; set; }
+    public string MasterId { get; set; }
 
     protected override async Task OnInitializedAsync()
     {
         using var context = DbFactory.CreateDbContext();
-        master = await context.Masters.FirstOrDefaultAsync(m => m.Id == MasterId);
+        master = await context.Users.FirstOrDefaultAsync(m => m.Id == MasterId);
 
         if (master is null)
         {
@@ -67,7 +68,7 @@
     public async Task DeleteMaster()
     {
         using var context = DbFactory.CreateDbContext();
-        context.Masters.Remove(master!);
+        context.Users.Remove(master!);
         await context.SaveChangesAsync();
         NavigationManager.NavigateTo("/masters");
     }

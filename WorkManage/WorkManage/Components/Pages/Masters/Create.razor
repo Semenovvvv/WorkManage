@@ -1,4 +1,5 @@
 ﻿@page "/masters/create"
+@attribute [Authorize(Roles = "Administrator")]
 
 @using Microsoft.EntityFrameworkCore
 @using WorkManage.Data
@@ -54,13 +55,13 @@
 @code {
 
     [SupplyParameterFromForm]
-    public Master Master { get; set; } = new();
+    public ApplicationUser Master { get; set; } = new();
 
     // To protect from overposting attacks, see https://aka.ms/RazorPagesCRUD
     public async Task AddMaster()
     {
         using var context = DbFactory.CreateDbContext();
-        context.Masters.Add(Master);
+        context.Users.Add(Master);
         await context.SaveChangesAsync();
         NavigationManager.NavigateTo("/masters");
     }

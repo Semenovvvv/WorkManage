@@ -4,9 +4,9 @@ using WorkManage.Data.Models;
 
 namespace WorkManage.Data.Configurations
 {
-    internal class MasterConfiguration : IEntityTypeConfiguration<Master>
+    internal class MasterConfiguration : IEntityTypeConfiguration<ApplicationUser>
     {
-        public void Configure(EntityTypeBuilder<Master> builder)
+        public void Configure(EntityTypeBuilder<ApplicationUser> builder)
         {
             builder.HasKey(x => x.Id);
 
