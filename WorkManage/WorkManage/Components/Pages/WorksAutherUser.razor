@@ -1,0 +1,41 @@
+﻿@page "/worksauthed"
+
+@using Microsoft.AspNetCore.Identity
+@using Microsoft.EntityFrameworkCore
+@using Microsoft.AspNetCore.Components.QuickGrid
+@using WorkManage.Data
+@using WorkManage.Data.Models
+@inject IDbContextFactory<WorkManage.Data.ApplicationDbContext> DbFactory
+@inject AuthenticationStateProvider AuthenticationStateProvider
+@implements IAsyncDisposable
+
+<PageTitle>Index</PageTitle>
+
+<h1>Работы</h1>
+
+<QuickGrid Class="table" Items="context.Works.Where(x => x.MasterId == MasterId)">
+    <PropertyColumn Property="work => work.Master.LastName + ' ' + work.Master.FirstName + ' ' + work.Master.Patronymic" Title="ФИО мастера" />
+    <PropertyColumn Property="work => work.Name" Title="Название" />
+
+    <TemplateColumn Context="work">
+        <a href="@($"workstages?workid={work.Id}")">Стадии</a> |
+        <a href="@($"works/details?workid={work.Id}")">Подробно</a> |
+    </TemplateColumn>
+</QuickGrid>
+
+@code {
+    [SupplyParameterFromQuery]
+    string? MasterId { get; set; }
+
+    ApplicationUser Master { get; set; }
+
+    ApplicationDbContext context = default!;
+
+    protected override async Task OnInitializedAsync()
+    {
+        context = DbFactory.CreateDbContext();
+        Master = context.Users.FirstOrDefault(x => x.Id == MasterId);
+    }
+
+    public async ValueTask DisposeAsync() => await context.DisposeAsync();
+}

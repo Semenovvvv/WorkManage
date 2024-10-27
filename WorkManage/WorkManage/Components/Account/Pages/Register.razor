@@ -15,6 +15,7 @@
 @inject ILogger<Register> Logger
 @inject NavigationManager NavigationManager
 @inject IdentityRedirectManager RedirectManager
+@inject ApplicationDbContext dbContext
 
 <PageTitle>Register</PageTitle>
 
@@ -43,6 +44,31 @@
                 <label for="confirm-password">Confirm Password</label>
                 <ValidationMessage For="() => Input.ConfirmPassword" class="text-danger" />
             </div>
+            <div class="mb-3">
+                <label for="lastname" class="form-label">Фамилия:</label>
+                <InputText id="lastname" @bind-Value="Input.LastName" class="form-control" />
+                <ValidationMessage For="() => Input.LastName" class="text-danger" />
+            </div>
+            <div class="mb-3">
+                <label for="firstname" class="form-label">Имя:</label>
+                <InputText id="firstname" @bind-Value="Input.FirstName" class="form-control" />
+                <ValidationMessage For="() => Input.FirstName" class="text-danger" />
+            </div>
+            <div class="mb-3">
+                <label for="patronymic" class="form-label">Отчество:</label>
+                <InputText id="patronymic" @bind-Value="Input.Patronymic" class="form-control" />
+                <ValidationMessage For="() => Input.Patronymic" class="text-danger" />
+            </div>
+            <div class="mb-3">
+                <label for="rank" class="form-label">Разряд:</label>
+                <InputText id="rank" @bind-Value="Input.Rank" class="form-control" />
+                <ValidationMessage For="() => Input.Rank" class="text-danger" />
+            </div>
+            <div class="mb-3">
+                <label for="hiredate" class="form-label">Дата найма:</label>
+                <InputDate id="hiredate" @bind-Value="Input.HireDate" class="form-control" />
+                <ValidationMessage For="() => Input.HireDate" class="text-danger" />
+            </div>
             <button type="submit" class="w-100 btn btn-lg btn-primary">Register</button>
         </EditForm>
     </div>
@@ -68,7 +94,14 @@
 
     public async Task RegisterUser(EditContext editContext)
     {
-        var user = CreateUser();
+        var user = new ApplicationUser()
+            {
+                LastName = Input.LastName,
+                FirstName = Input.FirstName,
+                Patronymic = Input.Patronymic,
+                Rank = Input.Rank,
+                HireDate = Input.HireDate
+            };
 
         await UserStore.SetUserNameAsync(user, Input.Email, CancellationToken.None);
         var emailStore = GetEmailStore();
@@ -80,6 +113,17 @@
             identityErrors = result.Errors;
             return;
         }
+
+        var roleId = dbContext.Roles.FirstOrDefault(d => d.Name == "Worker")!.Id;
+
+
+        dbContext.Add(new IdentityUserRole<string>()
+            {
+                UserId = user.Id,
+                RoleId = roleId
+            });
+
+        await dbContext.SaveChangesAsync();
 
         Logger.LogInformation("User created a new account with password.");
 
@@ -142,5 +186,26 @@
         [Display(Name = "Confirm password")]
         [Compare("Password", ErrorMessage = "The password and confirmation password do not match.")]
         public string ConfirmPassword { get; set; } = "";
+
+        [Required]
+        [Display(Name = "Фамилия")]
+        [StringLength(100, ErrorMessage = "{0} должно быть не меньше {2} и не больше {1} символов.", MinimumLength = 3)]
+        public string? LastName { get; set; }
+
+        [Required]
+        [Display(Name = "Имя")]
+        [StringLength(100, ErrorMessage = "{0} должно быть не меньше {2} и не больше {1} символов.", MinimumLength = 3)]
+        public string? FirstName { get; set; }
+
+        [Display(Name = "Отчество")]
+        public string? Patronymic { get; set; }
+
+        [Display(Name = "Разряд")]
+        public string? Rank { get; set; }
+
+        [Required]
+        [Display(Name = "Дата найма")]
+
+        public DateTime? HireDate { get; set; }
     }
 }
