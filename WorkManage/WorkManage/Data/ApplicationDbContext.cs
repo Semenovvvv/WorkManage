@@ -20,5 +20,9 @@ namespace WorkManage.Data
             modelBuilder.ApplyConfiguration(new WorkConfiguration());
             modelBuilder.ApplyConfiguration(new WorkStageConfiguration());
         }
+        protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
+        {
+            optionsBuilder.EnableSensitiveDataLogging();
+        }
     }
 }

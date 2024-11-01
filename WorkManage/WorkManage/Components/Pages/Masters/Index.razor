@@ -20,7 +20,7 @@
     <PropertyColumn Property="master => master.FirstName" Title="Имя" />
     <PropertyColumn Property="master => master.Patronymic" Title="Отчество" />
     <PropertyColumn Property="master => master.Rank" Title="Разряд" />
-    <PropertyColumn Property="master => master.HireDate" Title="Дата найма" />
+    <PropertyColumn Property="master => master.HireDate.Value.ToShortDateString()" Title="Дата найма" />
 
     <TemplateColumn Context="master">
         <a href="@($"works/?masterid={master.Id}")">Работы</a> |

@@ -1,5 +1,4 @@
-﻿@page "/works"
-@attribute [Authorize(Roles = "Administrator")]
+﻿@page "/allworks"
 
 @using Microsoft.EntityFrameworkCore
 @using Microsoft.AspNetCore.Components.QuickGrid
@@ -12,38 +11,21 @@
 
 <h1>Работы</h1>
 
-<p>
-    <a href="@($"works/create?masterid={MasterId}")">Добавить</a>
-</p>
-
-<div>
-    <a href="@($"masters")">Back to List</a>
-</div>
-
-<QuickGrid Class="table" Items="context.Works.Where(x => x.MasterId == MasterId)">
+<QuickGrid Class="table" Items="context.Works">
     <PropertyColumn Property="work => work.Master.LastName + ' ' + work.Master.FirstName + ' ' + work.Master.Patronymic" Title="ФИО мастера" />
     <PropertyColumn Property="work => work.Name" Title="Название" />
 
     <TemplateColumn Context="work">
-        <a href="@($"workstages?workid={work.Id}")">Стадии</a> |
-        <a href="@($"works/edit?workid={work.Id}")">Изменить</a> |
-        <a href="@($"works/details?workid={work.Id}")">Подробно</a> |
-        <a href="@($"works/delete?workid={work.Id}")">Удалить</a>
+        <a href="@($"workerstages?workid={work.Id}")">Стадии</a>
     </TemplateColumn>
 </QuickGrid>
 
 @code {
-    [SupplyParameterFromQuery]
-    string? MasterId { get; set; }
-
-    ApplicationUser Master { get; set; }
-
     ApplicationDbContext context = default!;
 
     protected override void OnInitialized()
     {
         context = DbFactory.CreateDbContext();
-        Master = context.Users.FirstOrDefault(x => x.Id == MasterId);
     }
 
     public async ValueTask DisposeAsync() => await context.DisposeAsync();

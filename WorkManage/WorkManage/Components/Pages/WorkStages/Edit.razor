@@ -1,4 +1,5 @@
 ﻿@page "/workstages/edit"
+@attribute [Authorize(Roles = "Administrator")]
 
 @using Microsoft.EntityFrameworkCore
 @using WorkManage.Data.Models
@@ -24,8 +25,8 @@ else
                 <ValidationSummary />
                 <input type="hidden" name="WorkStage.Id" value="@WorkStage.Id" />
                 <div class="mb-3">
-                 <label for="workstagename" class="form-label">Название работы:</label>
-                    <InputText disabled="@true" id="workstagename" @bind-Value="WorkStage.Name" class="form-control" />
+                 <label for="workstagename" class="form-label">Название стадии:</label>
+                    <InputText id="workstagename" @bind-Value="WorkStage.Name" class="form-control" />
                     <ValidationMessage For="() => WorkStage.Name" class="text-danger" />
                 </div>
                 <div class="mb-3">

@@ -8,6 +8,10 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <Content Remove="Components\Pages\WorksAutherUser.razor" />
+  </ItemGroup>
+
+  <ItemGroup>
     <ProjectReference Include="..\WorkManage.Client\WorkManage.Client.csproj" />
     <PackageReference Include="ClosedXML" Version="0.104.1" />
     <PackageReference Include="Microsoft.AspNetCore.Components.QuickGrid" Version="8.0.10" />

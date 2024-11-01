@@ -34,9 +34,23 @@
                 <ValidationMessage For="() => Master.Patronymic" class="text-danger" />
             </div>
             <div class="mb-3">
+                
                 <label for="rank" class="form-label">Разряд:</label>
-                <InputText id="rank" @bind-Value="Master.Rank" class="form-control" />
+                @* <InputText id="rank" @bind-Value="Master.Rank" class="form-control" /> *@
+                <InputSelect id="rank" @bind-Value="Master.Rank" class="form-control">
+                    <option value="">Выберите разряд</option>
+                    <option value="Junior">Junior</option>
+                    <option value="Middle">Middle</option>
+                    <option value="Senior">Senior</option>
+                    <option value="Lead">Lead</option>
+                </InputSelect>
                 <ValidationMessage For="() => Master.Rank" class="text-danger" />
+                <InputSelect id="val" @bind-Value="val" class="form-control">
+                    @foreach (var user in DbFactory.CreateDbContext().Users.Where(x => x.FirstName != null))
+                    {
+                        <option value="@user.FirstName">@($"{user.LastName} {user.FirstName} {user.Patronymic}")</option>
+                    }
+                </InputSelect>
             </div>
             <div class="mb-3">
                 <label for="hiredate" class="form-label">Дата найма:</label>
@@ -53,7 +67,7 @@
 </div>
 
 @code {
-
+    string val;
     [SupplyParameterFromForm]
     public ApplicationUser Master { get; set; } = new();
 

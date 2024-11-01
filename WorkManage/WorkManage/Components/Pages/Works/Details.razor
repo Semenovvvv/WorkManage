@@ -1,4 +1,5 @@
 ﻿@page "/works/details"
+@attribute [Authorize(Roles = "Administrator")]
 
 @using Microsoft.EntityFrameworkCore
 @using WorkManage.Data

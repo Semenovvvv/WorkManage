@@ -59,11 +59,22 @@
                 <InputText id="patronymic" @bind-Value="Input.Patronymic" class="form-control" />
                 <ValidationMessage For="() => Input.Patronymic" class="text-danger" />
             </div>
-            <div class="mb-3">
+            @* <div class="mb-3">
                 <label for="rank" class="form-label">Разряд:</label>
                 <InputText id="rank" @bind-Value="Input.Rank" class="form-control" />
                 <ValidationMessage For="() => Input.Rank" class="text-danger" />
+            </div> *@
+            <div class="mb-3">
+                <InputSelect id="rank" @bind-Value="Input.Rank" class="form-control">
+                    <option value="">Выберите разряд</option>
+                    <option value="Junior">Junior</option>
+                    <option value="Middle">Middle</option>
+                    <option value="Senior">Senior</option>
+                    <option value="Lead">Lead</option>
+                    <ValidationMessage For="() => Input.Rank" class="text-danger" />
+                </InputSelect>
             </div>
+            
             <div class="mb-3">
                 <label for="hiredate" class="form-label">Дата найма:</label>
                 <InputDate id="hiredate" @bind-Value="Input.HireDate" class="form-control" />

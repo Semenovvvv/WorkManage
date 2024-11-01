@@ -1,5 +1,4 @@
-﻿@page "/workstages"
-@attribute [Authorize(Roles = "Administrator")]
+﻿@page "/workerstages"
 
 @using Microsoft.EntityFrameworkCore
 @using Microsoft.AspNetCore.Components.QuickGrid
@@ -13,32 +12,14 @@
 
 <h1>Стадии работы</h1>
 
-<AuthorizeView Roles="Administrator">
-    <p>
-        <a href=@($"workstages/create?workid={work.Id}")>Добавить</a>
-    </p>
-    <div>
-        <a href="@($"works/?masterid={GetMasterId((int)WorkId)}")">Back to List</a>
-    </div>
-</AuthorizeView>
-
-
-<AuthorizeView Roles="Worker">
-    <div>
-        <a href="@($"works")">Back to List</a>
-    </div>
-</AuthorizeView>
+<div>
+    <a href="@($"allworks/")">Back to List</a>
+</div>
 
 <QuickGrid Class="table" Items="context.WorkStages.Where(x => x.WorkId == WorkId)">
-    <PropertyColumn Property="workStages => workStages.Work.Name" Title="Название работы"/>
+    <PropertyColumn Property="workStages => workStages.Work.Name" Title="Название работы" />
     <PropertyColumn Property="workStages => workStages.Name" Title="Название стадии" />
     <PropertyColumn Property="workStages => workStages.Price" Title="Стоимость" />
-
-    <TemplateColumn Context="workStage">
-        <a href="@($"workstages/edit?workstageid={workStage.Id}")">Изменить</a> |
-        <a href="@($"workstages/details?workstageid={workStage.Id}")">Подробно</a> |
-        <a href="@($"workstages/delete?workstageid={workStage.Id}")">Удалить</a>
-    </TemplateColumn>
 </QuickGrid>
 
 @code {
@@ -58,7 +39,7 @@
         {
             NavigationManager.NavigateTo("not found");
         }
-        { 
+        {
             work = context.Works.FirstOrDefault(d => d.Id == WorkId);
 
             if (work == null)
@@ -68,12 +49,6 @@
 
             WorkName = work?.Name;
         }
-    }
-
-    public string GetMasterId(int workId)
-    {
-        using var context = DbFactory.CreateDbContext();
-        return context.Works.FirstOrDefault(x => x.Id == workId).MasterId;
     }
 
     public async ValueTask DisposeAsync() => await context.DisposeAsync();

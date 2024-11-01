@@ -83,7 +83,10 @@
 
         i = 2;
 
-        foreach (var master in context.Users)
+        var masters = context.Users.OrderBy(x => x.LastName).ThenBy(x => x.FirstName).ToList();
+        masters = masters.Take(masters.Count() - 1).ToList();
+
+        foreach (var master in masters)
         {
             worksheetMasters.Cell(i, 1).Value = master.Id.ToString();
             worksheetMasters.Cell(i, 2).Value = master.LastName;

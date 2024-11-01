@@ -1,4 +1,5 @@
 ﻿@page "/workstages/delete"
+@attribute [Authorize(Roles = "Administrator")]
 
 @using Microsoft.EntityFrameworkCore
 @using WorkManage.Data.Models

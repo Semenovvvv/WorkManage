@@ -1,4 +1,5 @@
 ﻿@page "/workstages/create"
+@attribute [Authorize(Roles = "Administrator")]
 
 @using Microsoft.EntityFrameworkCore
 @using WorkManage.Data
@@ -24,11 +25,6 @@ else
                 <DataAnnotationsValidator />
                 <ValidationSummary class="text-danger" />
                 <input type="hidden" name="Work.Id" value="@Work.Id" />
-                @* <div class="mb-3">
-            <label for="workid" class="form-label">WorkId:</label>
-            <InputNumber id="workid" @bind-Value="WorkStage.WorkId" class="form-control" />
-            <ValidationMessage For="() => WorkStage.WorkId" class="text-danger" />
-            </div> *@
                 <div class="mb-3">
                     <label for="name" class="form-label">Name:</label>
                     <InputText id="name" @bind-Value="WorkStage.Name" class="form-control" />
